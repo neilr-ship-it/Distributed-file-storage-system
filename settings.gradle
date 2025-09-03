@@ -1,0 +1,4 @@
+//this file tells gradle what the project is called and which 
+//modules it should manage, 
+rootProject.name = 'mini-dfs'
+include 'common', 'storage-node', 'coordinator', 'client-cli'
