@@ -46,7 +46,7 @@ public class ChunkController {
     //succeeded or failed, httpservletrequest is the raw servlet request object from the underlying javsa EE layer, we use it because we want 
     //access to the body stream, req.getINputStream(), to read raw bytes of the chunk, access to headers (req.getHeader(x-checksum) for the sha 256
     //check  
-    public ResponseEntity<?> put(@PathVariable String chunkId, HttpServletRequest req) throws Exception {
+    public ResponseEntity<?> put(@PathVariable("chunkId") String chunkId, HttpServletRequest req) throws Exception {
         //first of all lets validate chunk format to be 64 - hex
         try {
             new ChunkId(chunkId);
@@ -55,7 +55,7 @@ public class ChunkController {
         }
 
         //validate the checksum 
-        String checkSum = req.getHeader("X-CheckSum");
+        String checkSum = req.getHeader("X-Checksum");
         if(!StringUtils.hasText(checkSum) || checkSum.length() != 64) {
             return ResponseEntity.badRequest().body("missing and or invalid checksum!");
         }
@@ -114,6 +114,12 @@ public class ChunkController {
             return ResponseEntity.badRequest().body("checksum mismatch");
         }
 
+        if (!actual.equalsIgnoreCase(chunkId)) {
+            Files.deleteIfExists(tmp);
+            return ResponseEntity.badRequest().body("chunkId must equal SHA-256 of content");
+        }
+
+
         //nnow that all checks have been done it is time to fsync temp then atomic move into place
         //fsync is an os level call that flushes all buffered file data and metadata 
         //from memory to disk, calling fsync forces os to push everything down to disk guaraneeing
@@ -168,6 +174,8 @@ public class ChunkController {
 //chunks/chunkid call this method and the response will be binary bytes (file content)
 //effectively this is the endpoint to retrieve a strored chunk from the dfs node 
 
+
+
 @GetMapping(value = "/{chunkId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 //Resource is a spring abstraction form it can represent a file on disk etc and it gives 
 //flexibility, the controller doesnt have to hardcode the file, its just says here is a 
@@ -176,7 +184,7 @@ public class ChunkController {
 //responseEntitty<resource> we are returning a full http response that contains raw 
 //bytes which is the http response body, headers like content type, content length etc 
 //and a status code like 200 for ok or 404 not found 
-public ResponseEntity<Resource> get(String chunkId) throws IOException {
+public ResponseEntity<Resource> get(@PathVariable("chunkId") String chunkId) throws IOException {
     //confirm the chunkId is valid 
     try {
         new ChunkId(chunkId);
@@ -184,8 +192,16 @@ public ResponseEntity<Resource> get(String chunkId) throws IOException {
         return ResponseEntity.badRequest().build();
     }
     Path fileToGetPath = pathFor(chunkId);
+    //check if file actually exists 
+    if(!Files.exists(fileToGetPath) || !Files.isReadable(fileToGetPath)) {
+        return ResponseEntity.notFound().build();
+    }
     Resource file = new FileSystemResource(fileToGetPath);
-    return ResponseEntity.ok(file);
+    if (!file.exists() || !file.isReadable()) {
+        return ResponseEntity.notFound().build();
+    }
+
+    return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).contentLength(Files.size(fileToGetPath)).body(file);
 }
 
 //pathfor and tohex helper methods 
