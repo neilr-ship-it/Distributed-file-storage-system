@@ -1,0 +1,15 @@
+# server:
+#   port: 8081  # uncomment/adjust when you run multiple nodes
+
+mdfs:
+  data-dir: ./data
+logging:
+  level:
+    dev.mdfs.node: INFO
+#understadning what a yaml file is, this is the central configuration file, spring boot looks 
+#for it on startup, it contains all the knobs/settings for the app, server port
+#logging levels and custom app settings, i declare them ere and spring wires them in 
+#mdfs data-dir: ./data tells our node where to store chunks, yaml stands for 
+#YAML AINT MARKUP LANGUAGE, human friendly data format similar to json but less cluttered
+# uses indentation to express structure, uses key value pairs for configs, supports 
+#nested st

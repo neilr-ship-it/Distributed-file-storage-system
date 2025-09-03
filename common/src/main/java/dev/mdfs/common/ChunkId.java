@@ -9,13 +9,13 @@ package dev.mdfs.common;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class ChunkID {
+public class ChunkId {
     private final String value; //64 char lowercase hex (sha256)
 
     @JsonCreator //lets jackson create a chunkID from a JSON string when deserialziing
     //requests and responses, json value tells jackson to serialize chunkID back to 
     //string value in JSON 
-    public ChunkID(String value) {
+    public ChunkId(String value) {
         if(value == null || value.length() != 64) {
             throw new IllegalArgumentException();
         }
@@ -23,7 +23,7 @@ public class ChunkID {
         //validate hex chars
         for(int i = 0; i < 64; i++) {
             char currChar = this.value.charAt(i);
-            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))) {
+            if (!((currChar >= '0' && currChar <= '9') || (currChar >= 'a' && currChar <= 'f'))) {
                 throw new IllegalArgumentException("chunk id must be hex format");
             }
         }
@@ -32,7 +32,6 @@ public class ChunkID {
     // tells json serializer jackson that when converting chunkID object to json it 
     //should just be represented as the string inside 
     @JsonValue
-    @Override
     public String value() {
         return value;
     }
@@ -52,6 +51,6 @@ public class ChunkID {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceOf ChunkID c) && c.value.equals(this.value);
+        return (o instanceof ChunkId c) && c.value.equals(this.value);
     }
 }
