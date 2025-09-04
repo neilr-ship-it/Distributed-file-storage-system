@@ -4,4 +4,4 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web:3.3.2'
   implementation 'org.xerial:sqlite-jdbc:3.46.0.0' // node index or coord metadata (later)
 }
-application { mainClass = 'dev.mdfs.node.NodeApp' } // change for coordinator
+application { mainClass = 'dev.mdfs.coordinator.CoordinatorApp' } // change for coordinator
