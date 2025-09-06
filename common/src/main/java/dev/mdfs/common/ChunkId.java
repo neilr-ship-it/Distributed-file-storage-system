@@ -53,4 +53,9 @@ public class ChunkId {
     public boolean equals(Object o) {
         return (o instanceof ChunkId c) && c.value.equals(this.value);
     }
+
+     // Factory helper for readability
+    public static ChunkId fromHex(String hex) {
+        return new ChunkId(hex);
+    }
 }

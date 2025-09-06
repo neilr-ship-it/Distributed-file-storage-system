@@ -23,7 +23,7 @@ public class NodeRegistry {
         //above lines of code splits csv string into parts trims whitespace 
         //and then for each non empty string converts it into a URI object and adds 
         //it to the list,  set nodes = to this list 
-        this.nodes = Collections.unmodifiableList(list)
+        this.nodes = Collections.unmodifiableList(list);
     }
 
     //now we want to provide read only access to all registered nodes, since its 
